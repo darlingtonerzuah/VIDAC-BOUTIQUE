@@ -10,31 +10,31 @@
 <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,600;12..96,700;12..96,800&family=Work+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@500;600&display=swap" rel="stylesheet">
 <style>
   :root {
-    --brand: #3D3BBF;      /* Cool Royal Indigo/Violet (similar to reference logo) */
-    --brand-hover: #504ED4;
-    --gold: #B794F4;       /* Luminous Warm-Lavender */
-    --gold-light: #D6BCFA;  /* Soft Warm-Lilac */
-    --on-gold: #0F172A;    /* Dark Slate for high contrast on light background */
-    --bg: #F5F7FB;         /* Soft cool icy blue/grey background */
-    --bg-rgb: 245, 247, 251;
-    --surface: #EBF0F6;    /* Clean cool surface */
-    --text: #0F172A;       /* Slate 900 */
-    --text-soft: #475569;  /* Slate 600 */
-    --line: rgba(15, 23, 42, 0.08);
-    --hero-bg: #1B1A4C;    /* Deep luxurious royal blue/navy */
-    --cream-fixed: #F8FAFC;/* Sleek cool slate white */
-    --shadow-sm: 0 2px 8px rgba(61, 59, 191, 0.04);
-    --shadow-md: 0 10px 25px -5px rgba(61, 59, 191, 0.08), 0 8px 16px -6px rgba(61, 59, 191, 0.06);
+    --brand: #5C162E;      /* Luxury Wine / Burgundy */
+    --brand-hover: #7A2240;
+    --gold: #D4AF37;       /* Radiant Gold */
+    --gold-light: #E4C878;
+    --on-gold: #1A1412;
+    --bg: #FAF7F2;         /* Warm Champagne/Ivory background */
+    --bg-rgb: 250, 247, 242;
+    --surface: #F0EAE1;    /* Symmetrical surface card background */
+    --text: #1A1412;       /* Charcoal cocoa text */
+    --text-soft: #635652;  /* Muted soft secondary text */
+    --line: rgba(26, 20, 18, 0.08);
+    --hero-bg: #400E20;    /* Deep luxurious burgundy for hero block */
+    --cream-fixed: #FAF7F2;
+    --shadow-sm: 0 2px 8px rgba(92, 22, 46, 0.04);
+    --shadow-md: 0 10px 25px -5px rgba(92, 22, 46, 0.08), 0 8px 16px -6px rgba(92, 22, 46, 0.06);
   }
   [data-theme="dark"] {
-    --bg: #090915;         /* Deep midnight violet background */
-    --bg-rgb: 9, 9, 21;
-    --surface: #13142B;    /* Deep indigo/violet surface */
-    --text: #F1F5F9;       /* Light slate text */
-    --text-soft: #94A3B8;  /* Soft secondary text */
-    --line: rgba(241, 245, 249, 0.1);
-    --brand: #B794F4;      /* Luminous lavender is primary in dark theme */
-    --brand-hover: #F8FAFC;
+    --bg: #15100E;         /* Dark Cocoa background */
+    --bg-rgb: 21, 16, 14;
+    --surface: #201815;    /* Rich dark surface */
+    --text: #F5EFE6;       /* Warm light text */
+    --text-soft: #BCAEA6;  /* Soft secondary text */
+    --line: rgba(245, 239, 230, 0.1);
+    --brand: #E4C878;      /* Gold is the brand primary in dark theme */
+    --brand-hover: #FAF7F2;
     --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.2);
     --shadow-md: 0 10px 25px -5px rgba(0, 0, 0, 0.3), 0 8px 16px -6px rgba(0, 0, 0, 0.2);
   }
@@ -207,7 +207,7 @@
   }
   .btn-gold:hover { 
     transform: translateY(-1px); 
-    box-shadow: 0 6px 16px rgba(183, 148, 244, 0.25); 
+    box-shadow: 0 6px 16px rgba(212, 175, 55, 0.25); 
   }
   .btn-outline { 
     border: 1.5px solid var(--brand); 
@@ -216,7 +216,7 @@
   }
   .btn-outline:hover { 
     transform: translateY(-1px); 
-    background: rgba(61, 59, 191, 0.04); 
+    background: rgba(92, 22, 46, 0.04); 
   }
 
   /* Hamburger Menu Toggle SVG */
@@ -326,7 +326,7 @@
     margin-top: 20px; 
     font-size: 17px; 
     max-width: 48ch; 
-    color: rgba(248, 250, 252, 0.78); 
+    color: rgba(250, 247, 242, 0.78); 
   }
   .hero-cta { 
     display: flex; 
@@ -335,7 +335,7 @@
     flex-wrap: wrap; 
   }
   .btn-hero-outline { 
-    border: 1.5px solid rgba(248, 250, 252, 0.4); 
+    border: 1.5px solid rgba(250, 247, 242, 0.4); 
     color: var(--cream-fixed); 
     background: none; 
   }
@@ -357,19 +357,19 @@
     padding: 14px; 
     font-family: 'IBM Plex Mono', monospace; 
     font-size: 11px; 
-    color: rgba(248, 250, 252, 0.65); 
+    color: rgba(250, 247, 242, 0.65); 
     background-size: cover; 
   }
   .swatch span { 
-    background: rgba(27, 26, 76, 0.7); 
+    background: rgba(64, 14, 32, 0.7); 
     padding: 4px 8px; 
     border-radius: 4px; 
     backdrop-filter: blur(2px); 
   }
-  .sw1 { background: url('images/statement_pieces.png') center/cover no-repeat, repeating-linear-gradient(135deg, #2B2D6E, #2B2D6E 12px, #1A1B4B 12px, #1A1B4B 24px); margin-top: 36px; }
-  .sw2 { background: url('images/footwear.png') center/cover no-repeat, repeating-linear-gradient(45deg, #3D3BBF, #3D3BBF 12px, #2A278A 12px, #2A278A 24px); }
-  .sw3 { background: url('images/bags.png') center/cover no-repeat, repeating-linear-gradient(45deg, #B794F4, #B794F4 12px, #A78BFA 12px, #A78BFA 24px); }
-  .sw4 { background: url('images/custom_fits.png') center/cover no-repeat, repeating-linear-gradient(135deg, #1E1B4B, #1E1B4B 12px, #0F0E26 12px, #0F0E26 24px); margin-top: 36px; }
+  .sw1 { background: url('images/statement_pieces.png') center/cover no-repeat, repeating-linear-gradient(135deg, #4A1225, #4A1225 12px, #360B1A 12px, #360B1A 24px); margin-top: 36px; }
+  .sw2 { background: url('images/footwear.png') center/cover no-repeat, repeating-linear-gradient(45deg, #7A2240, #7A2240 12px, #5C162E 12px, #5C162E 24px); }
+  .sw3 { background: url('images/bags.png') center/cover no-repeat, repeating-linear-gradient(45deg, #C9962B, #C9962B 12px, #B08221 12px, #B08221 24px); }
+  .sw4 { background: url('images/custom_fits.png') center/cover no-repeat, repeating-linear-gradient(135deg, #2D1A1F, #2D1A1F 12px, #1A1012 12px, #1A1012 24px); margin-top: 36px; }
 
   /* Infinite Scrolling Ribbon */
   .strip { 
@@ -582,8 +582,8 @@
     width: 28px; 
     height: 28px; 
     border-radius: 50%; 
-    background: rgba(15, 23, 42, 0.65); 
-    color: #F8FAFC; 
+    background: rgba(26, 20, 18, 0.65); 
+    color: #FAF7F2; 
     display: flex; 
     align-items: center; 
     justify-content: center; 
@@ -594,10 +594,10 @@
   .piece-photo.is-zoomable:hover::after, .piece-photo.is-zoomable:focus-visible::after { opacity: 1; }
   .piece-photo.is-zoomable:focus-visible { outline: 3px solid var(--gold); outline-offset: -3px; }
 
-  .p-fallback-0 { background: repeating-linear-gradient(120deg, #E0E7FF, #E0E7FF 10px, #C7D2FE 10px, #C7D2FE 20px); }
-  .p-fallback-1 { background: repeating-linear-gradient(60deg, #EDE9FE, #EDE9FE 10px, #DDD6FE 10px, #DDD6FE 20px); }
-  .p-fallback-2 { background: repeating-linear-gradient(120deg, #E0F2FE, #E0F2FE 10px, #BAE6FD 10px, #BAE6FD 20px); }
-  .p-fallback-3 { background: repeating-linear-gradient(60deg, #F5F3FF, #F5F3FF 10px, #E0DDFE 10px, #E0DDFE 20px); }
+  .p-fallback-0 { background: repeating-linear-gradient(120deg, #E6DEC9, #E6DEC9 10px, #D6CCA8 10px, #D6CCA8 20px); }
+  .p-fallback-1 { background: repeating-linear-gradient(60deg, #EADBC0, #EADBC0 10px, #DABFA8 10px, #DABFA8 20px); }
+  .p-fallback-2 { background: repeating-linear-gradient(120deg, #DDDCD0, #DDDCD0 10px, #CCCBB8 10px, #CCCBB8 20px); }
+  .p-fallback-3 { background: repeating-linear-gradient(60deg, #E4D0CD, #E4D0CD 10px, #D4C0BE 10px, #D4C0BE 20px); }
   
   .piece-info { padding: 14px 16px 18px; }
   .piece-info .tag { 
@@ -651,7 +651,7 @@
     margin-bottom: 18px; 
   }
   .tailoring p { 
-    color: rgba(248, 250, 252, 0.82); 
+    color: rgba(250, 247, 242, 0.82); 
     font-size: 16px; 
     max-width: 52ch; 
   }
@@ -666,7 +666,7 @@
     gap: 14px; 
     align-items: flex-start; 
     font-size: 14px; 
-    color: rgba(248, 250, 252, 0.9); 
+    color: rgba(250, 247, 242, 0.9); 
   }
   .tailoring-step .dot { 
     width: 8px; 
@@ -680,7 +680,7 @@
   .tailoring-visual { 
     aspect-ratio: 1/1; 
     border-radius: 12px; 
-    background: url('images/fitting_session.png') center/cover no-repeat, repeating-linear-gradient(135deg, #2B2D6E, #2B2D6E 16px, #1A1B4B 16px, #1A1B4B 32px); 
+    background: url('images/fitting_session.png') center/cover no-repeat, repeating-linear-gradient(135deg, #4A1225, #4A1225 16px, #360B1A 16px, #360B1A 32px); 
     display: flex; 
     align-items: flex-end; 
     padding: 20px; 
@@ -688,7 +688,7 @@
   .tailoring-visual span { 
     font-family: 'IBM Plex Mono', monospace; 
     font-size: 12px; 
-    background: rgba(15, 23, 42, 0.6); 
+    background: rgba(26, 16, 18, 0.6); 
     padding: 6px 10px; 
     border-radius: 6px; /* Concentric, outer is 12px, inner is 6px with padding 20px */
     color: var(--cream-fixed); 
@@ -724,7 +724,7 @@
 
   /* Footer */
   footer { 
-    background: #0B0B1E; /* Rich dark midnight navy */
+    background: #1A1012; /* Rich dark brown/black */
     color: var(--cream-fixed); 
   }
   .footer-grid { 
@@ -739,7 +739,7 @@
     margin-bottom: 16px; 
   }
   footer p { 
-    color: rgba(248, 250, 252, 0.65); 
+    color: rgba(250, 247, 242, 0.65); 
     font-size: 15px; 
     max-width: 36ch; 
   }
@@ -755,16 +755,16 @@
   .footer-col a, .footer-col p { 
     display: block; 
     font-size: 14px; 
-    color: rgba(248, 250, 252, 0.75); 
+    color: rgba(250, 247, 242, 0.75); 
     margin-bottom: 10px; 
   }
   .footer-col a:hover { color: var(--gold-light); }
   
   .footer-bottom { 
-    border-top: 1px solid rgba(248, 250, 252, 0.1); 
+    border-top: 1px solid rgba(250, 247, 242, 0.1); 
     padding: 22px 0; 
     font-size: 12px; 
-    color: rgba(248, 250, 252, 0.4); 
+    color: rgba(250, 247, 242, 0.4); 
     display: flex; 
     justify-content: space-between; 
     flex-wrap: wrap; 
@@ -776,7 +776,7 @@
     position: fixed; 
     inset: 0; 
     z-index: 200;
-    background: rgba(9, 9, 21, 0.96);
+    background: rgba(10, 7, 9, 0.94);
     display: flex; 
     flex-direction: column; 
     align-items: center; 
@@ -793,7 +793,7 @@
     box-shadow: 0 10px 40px rgba(0,0,0,0.5);
   }
   .lightbox-caption { 
-    color: #F1F5F9; 
+    color: #F5EFE6; 
     font-family: 'Work Sans', sans-serif; 
     font-size: 14px; 
   }
@@ -805,7 +805,7 @@
     height: 44px; 
     border-radius: 50%;
     background: rgba(255, 255, 255, 0.1); 
-    color: #F8FAFC; 
+    color: #FAF7F2; 
     border: 1.5px solid rgba(255, 255, 255, 0.2);
     font-size: 26px; 
     line-height: 1; 
