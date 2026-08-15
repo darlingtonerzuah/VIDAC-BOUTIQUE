@@ -45,7 +45,7 @@
   img,svg{display:block; max-width:100%;}
   a{color:inherit; text-decoration:none;}
   ul{list-style:none;}
-  .wrap{max-width:1180px; margin:0 auto; padding-inline:24px;}
+  .wrap{max-width:1180px; margin:0 auto; padding-left:24px; padding-right:24px;}
   h1,h2,h3{font-family:'Bricolage Grotesque', sans-serif; font-weight:700; letter-spacing:-0.01em;}
   a:focus-visible, button:focus-visible{outline:3px solid var(--gold); outline-offset:3px; border-radius:2px;}
 
@@ -130,7 +130,7 @@
   .piece:hover{transform:translateY(-4px); box-shadow:0 14px 28px rgba(12,75,63,0.14);}
   .piece.is-sold{opacity:0.55;}
   .piece-photo{aspect-ratio:4/5; display:flex; align-items:center; justify-content:center; font-family:'IBM Plex Mono', monospace; font-size:11px; color:#5A4E58; text-align:center; padding:12px; position:relative; overflow:hidden;}
-  .piece-photo img{position:absolute; inset:0; width:100%; height:100%; object-fit:cover;}
+  .piece-photo img{position:absolute; top:0; right:0; bottom:0; left:0; width:100%; height:100%; object-fit:cover;}
   .piece-photo .photo-fallback-label{position:relative; z-index:1;}
   .piece-photo .sold-badge{position:absolute; top:10px; right:10px; z-index:2; background:var(--footer-bg); color:var(--cream-fixed); font-family:'IBM Plex Mono',monospace; font-size:10px; text-transform:uppercase; letter-spacing:.06em; padding:4px 8px; border-radius:4px;}
   .p-fallback-0{background:repeating-linear-gradient(120deg,#e3dccb,#e3dccb 10px,#d8cfb8 10px,#d8cfb8 20px);}
@@ -156,7 +156,7 @@
   .tailoring-visual span{font-family:'IBM Plex Mono',monospace; font-size:12px; background:rgba(29,18,32,0.4); padding:6px 10px; border-radius:5px; color:var(--cream-fixed);}
 
   .proof{background:var(--surface); border-top:1px solid var(--line); border-bottom:1px solid var(--line); transition:background .25s ease, border-color .25s ease;}
-  .proof .wrap{display:grid; grid-template-columns:repeat(3,1fr); gap:32px; text-align:center; padding-block:56px;}
+  .proof .wrap{display:grid; grid-template-columns:repeat(3,1fr); gap:32px; text-align:center; padding-top:56px; padding-bottom:56px;}
   .proof-stat h3{font-size:clamp(30px,4vw,42px); color:var(--brand); transition:color .25s ease;}
   .proof-stat p{font-size:13px; color:var(--text-soft); margin-top:6px; font-family:'IBM Plex Mono',monospace; text-transform:uppercase; letter-spacing:0.05em;}
 
