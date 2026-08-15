@@ -121,7 +121,31 @@
   .section-head h2{font-size:clamp(28px, 3.4vw, 40px); color:var(--brand); transition:color .25s ease;}
   .section-head p{color:var(--text-soft); max-width:42ch; font-size:15px;}
 
-  .filter-row{display:flex; gap:10px; flex-wrap:wrap; margin-bottom:36px; color:var(--brand);}
+  .category-row{margin-bottom:44px;}
+  .category-row-head{display:flex; justify-content:space-between; align-items:baseline; margin-bottom:16px; gap:16px;}
+  .category-row-head h3{font-family:'Bricolage Grotesque', sans-serif; font-size:19px; font-weight:700; color:var(--brand); transition:color .25s ease;}
+  .view-all-link{
+    display:inline-flex; align-items:center; gap:6px;
+    font-family:'IBM Plex Mono', monospace; font-size:12px; font-weight:600;
+    text-transform:uppercase; letter-spacing:0.06em;
+    color:var(--text-soft); background:none; border:none; cursor:pointer;
+    padding:4px; flex-shrink:0; transition:color .15s ease;
+  }
+  .view-all-link:hover{color:var(--brand);}
+  .row-scroll{
+    display:flex; gap:16px; overflow-x:auto; padding-bottom:6px;
+    scroll-snap-type:x proximity; -webkit-overflow-scrolling:touch;
+    scrollbar-width:none;
+  }
+  .row-scroll::-webkit-scrollbar{display:none;}
+  .row-scroll .piece{flex:0 0 190px; scroll-snap-align:start;}
+  .back-link{
+    display:inline-flex; align-items:center; gap:8px; margin-bottom:20px;
+    font-family:'IBM Plex Mono', monospace; font-size:13px; font-weight:600;
+    color:var(--text-soft); background:none; border:none; cursor:pointer; padding:6px 0;
+    transition:color .15s ease;
+  }
+  .back-link:hover{color:var(--brand);}
 
   .collection-grid{display:grid; grid-template-columns:repeat(4, 1fr); gap:20px; min-height:120px;}
   .piece{background:var(--surface); border-radius:10px; overflow:hidden; border:1px solid var(--line); transition:transform .18s ease, box-shadow .18s ease, background .25s ease, border-color .25s ease; opacity:0; animation:pieceIn .5s ease forwards;}
@@ -202,6 +226,7 @@
     .hero-grid, .tailoring-grid{grid-template-columns:1fr;}
     .hero-visual{padding-bottom:0; margin-top:36px;}
     .collection-grid{grid-template-columns:repeat(2,1fr);}
+    .row-scroll .piece{flex-basis:150px;}
     .proof .wrap{grid-template-columns:1fr; gap:28px;}
     .footer-grid{grid-template-columns:1fr; gap:36px; text-align:center;}
     .footer-grid p{max-width:none; margin-left:auto; margin-right:auto;}
@@ -279,16 +304,24 @@
 
 <section id="collection">
   <div class="wrap">
-    <div class="section-head reveal">
-      <div>
-        <h2>This week's collection</h2>
-        <p>Pulled live from Vidic's own stock sheet — updated by the shop, not by us.</p>
+    <div id="collectionHome">
+      <div class="section-head reveal">
+        <div>
+          <h2>This week's collection</h2>
+          <p>Pulled live from Vidic's own stock sheet — updated by the shop, not by us.</p>
+        </div>
+        <a class="btn btn-outline" data-wa-link href="#" target="_blank" rel="noopener">See full range on WhatsApp</a>
       </div>
-      <a class="btn btn-outline" data-wa-link href="#" target="_blank" rel="noopener">See full range on WhatsApp</a>
+      <div id="categoryRows">
+        <p class="catalog-status" id="catalogStatus">Loading the current collection…</p>
+      </div>
     </div>
-    <div class="filter-row" id="filterRow" aria-label="Filter by category"></div>
-    <div class="collection-grid" id="collectionGrid">
-      <p class="catalog-status" id="catalogStatus">Loading the current collection…</p>
+    <div id="collectionCategoryView" hidden>
+      <button class="back-link" id="backToCollection" type="button">&larr; All Categories</button>
+      <div class="section-head">
+        <h2 id="categoryViewTitle"></h2>
+      </div>
+      <div class="collection-grid" id="categoryFullGrid"></div>
     </div>
   </div>
 </section>
@@ -375,7 +408,7 @@
     whatsappNumber: "233244464345", // digits only, country code, no +
     // Publish your Google Sheet: File > Share > Publish to web > CSV
     // Paste the resulting link below.
-    sheetCsvUrl: "https://docs.google.com/spreadsheets/d/e/2PACX-1vQipIEWyaTdByuEV2xMp1yVbgzZlOIuBrC2WeVUYI-58_-HhqmBB9W7m2Y-Qz6MB_RQLWhsZoYy_vdN/pub?output=csv",
+    sheetCsvUrl: "https://docs.google.com/spreadsheets/d/1HfV8ZITsXqdr5LhfuNqo6mE8aDfXyoePW1LeGozzgTs/gviz/tq?tqx=out:csv&sheet=Sheet1",
     // Expected columns in the sheet, in this exact order:
     // name, category, price, photo_url, status
     // status should be the word "active" or "sold"
@@ -436,88 +469,14 @@
     { name: 'Tailored Jumpsuit', category: 'Jumpsuits', price: 'GH₵ —', photo: '', status: 'active' },
   ];
 
-  const grid = document.getElementById('collectionGrid');
-  const statusEl = document.getElementById('catalogStatus');
-  const filterRow = document.getElementById('filterRow');
+  const categoryRowsEl = document.getElementById('categoryRows');
+  const collectionHomeEl = document.getElementById('collectionHome');
+  const categoryViewEl = document.getElementById('collectionCategoryView');
+  const categoryFullGrid = document.getElementById('categoryFullGrid');
+  const categoryViewTitle = document.getElementById('categoryViewTitle');
+  const backToCollectionBtn = document.getElementById('backToCollection');
   let allProducts = [];
-  let activeFilter = 'All';
-
-  function renderProducts() {
-    const list = activeFilter === 'All'
-      ? allProducts
-      : allProducts.filter(p => p.category === activeFilter);
-
-    grid.innerHTML = '';
-    if (!list.length) {
-      grid.innerHTML = '<p class="catalog-status">Nothing in this category right now — check back soon.</p>';
-      return;
-    }
-    list.forEach((p, i) => {
-      const card = document.createElement('div');
-      card.className = 'piece' + (p.status === 'sold' ? ' is-sold' : '');
-      card.style.animationDelay = Math.min(i, 8) * 40 + 'ms';
-
-      const fallbackClass = 'p-fallback-' + (i % 4);
-      const photoDiv = document.createElement('div');
-      photoDiv.className = 'piece-photo';
-
-      if (p.status === 'sold') {
-        const badge = document.createElement('span');
-        badge.className = 'sold-badge';
-        badge.textContent = 'Sold out';
-        photoDiv.appendChild(badge);
-      }
-
-      function showFallback() {
-        photoDiv.classList.add(fallbackClass);
-        const label = document.createElement('span');
-        label.className = 'photo-fallback-label';
-        label.textContent = p.photo ? 'photo link broken' : 'product photo';
-        photoDiv.prepend(label);
-      }
-
-      if (p.photo) {
-        const img = document.createElement('img');
-        img.loading = 'lazy';
-        img.alt = p.name;
-        img.src = p.photo;
-        img.onerror = function () {
-          img.remove();
-          photoDiv.classList.remove('is-zoomable');
-          showFallback();
-        };
-        photoDiv.classList.add('is-zoomable');
-        photoDiv.setAttribute('role', 'button');
-        photoDiv.setAttribute('tabindex', '0');
-        photoDiv.setAttribute('aria-label', 'View larger photo of ' + p.name);
-        photoDiv.addEventListener('click', function(){ openLightbox(p.photo, p.name); });
-        photoDiv.addEventListener('keydown', function(e){
-          if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); openLightbox(p.photo, p.name); }
-        });
-        photoDiv.prepend(img);
-      } else {
-        showFallback();
-      }
-
-      const infoDiv = document.createElement('div');
-      infoDiv.className = 'piece-info';
-
-      const tagSpan = document.createElement('span');
-      tagSpan.className = 'tag';
-      tagSpan.textContent = p.category;
-
-      const nameH3 = document.createElement('h3');
-      nameH3.textContent = p.name;
-
-      const priceP = document.createElement('p');
-      priceP.className = 'price';
-      priceP.textContent = p.price || 'Ask on WhatsApp';
-
-      infoDiv.append(tagSpan, nameH3, priceP);
-      card.append(photoDiv, infoDiv);
-      grid.appendChild(card);
-    });
-  }
+  const ROW_LIMIT = 8;
 
   function escapeHtml(str) {
     const div = document.createElement('div');
@@ -525,30 +484,192 @@
     return div.innerHTML;
   }
 
-  function renderFilters() {
-    const categories = ['All', ...new Set(allProducts.map(p => p.category))];
-    filterRow.innerHTML = '';
-    categories.forEach(cat => {
-      const btn = document.createElement('button');
-      btn.className = 'tag';
-      btn.type = 'button';
-      btn.textContent = cat;
-      btn.setAttribute('aria-pressed', cat === activeFilter ? 'true' : 'false');
-      btn.addEventListener('click', () => {
-        activeFilter = cat;
-        filterRow.querySelectorAll('button').forEach(b => b.setAttribute('aria-pressed', b === btn ? 'true' : 'false'));
-        renderProducts();
+  // Builds one product card. Reused by both the horizontal rows and the
+  // full category grid view, so the two stay visually identical.
+  function buildProductCard(p, i) {
+    const card = document.createElement('div');
+    card.className = 'piece' + (p.status === 'sold' ? ' is-sold' : '');
+    card.style.animationDelay = Math.min(i, 8) * 40 + 'ms';
+
+    const fallbackClass = 'p-fallback-' + (i % 4);
+    const photoDiv = document.createElement('div');
+    photoDiv.className = 'piece-photo';
+
+    if (p.status === 'sold') {
+      const badge = document.createElement('span');
+      badge.className = 'sold-badge';
+      badge.textContent = 'Sold out';
+      photoDiv.appendChild(badge);
+    }
+
+    function showFallback() {
+      photoDiv.classList.add(fallbackClass);
+      const label = document.createElement('span');
+      label.className = 'photo-fallback-label';
+      label.textContent = p.photo ? 'photo link broken' : 'product photo';
+      photoDiv.prepend(label);
+    }
+
+    if (p.photo) {
+      const img = document.createElement('img');
+      img.loading = 'lazy';
+      img.alt = p.name;
+      img.src = p.photo;
+      img.onerror = function () {
+        img.remove();
+        photoDiv.classList.remove('is-zoomable');
+        showFallback();
+      };
+      photoDiv.classList.add('is-zoomable');
+      photoDiv.setAttribute('role', 'button');
+      photoDiv.setAttribute('tabindex', '0');
+      photoDiv.setAttribute('aria-label', 'View larger photo of ' + p.name);
+      photoDiv.addEventListener('click', function(){ openLightbox(p.photo, p.name); });
+      photoDiv.addEventListener('keydown', function(e){
+        if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); openLightbox(p.photo, p.name); }
       });
-      filterRow.appendChild(btn);
+      photoDiv.prepend(img);
+    } else {
+      showFallback();
+    }
+
+    const infoDiv = document.createElement('div');
+    infoDiv.className = 'piece-info';
+
+    const tagSpan = document.createElement('span');
+    tagSpan.className = 'tag';
+    tagSpan.textContent = p.category;
+
+    const nameH3 = document.createElement('h3');
+    nameH3.textContent = p.name;
+
+    const priceP = document.createElement('p');
+    priceP.className = 'price';
+    priceP.textContent = p.price || 'Ask on WhatsApp';
+
+    infoDiv.append(tagSpan, nameH3, priceP);
+    card.append(photoDiv, infoDiv);
+    return card;
+  }
+
+  function getCategoriesInOrder() {
+    const seen = [];
+    allProducts.forEach(p => { if (!seen.includes(p.category)) seen.push(p.category); });
+    return seen;
+  }
+
+  function renderHome() {
+    categoryRowsEl.innerHTML = '';
+    if (!allProducts.length) {
+      categoryRowsEl.innerHTML = '<p class="catalog-status">Nothing in stock right now — check back soon.</p>';
+      return;
+    }
+    getCategoriesInOrder().forEach(cat => {
+      const items = allProducts.filter(p => p.category === cat);
+      const rowWrap = document.createElement('div');
+      rowWrap.className = 'category-row';
+
+      const head = document.createElement('div');
+      head.className = 'category-row-head';
+      const h3 = document.createElement('h3');
+      h3.textContent = cat;
+      const viewAllBtn = document.createElement('button');
+      viewAllBtn.type = 'button';
+      viewAllBtn.className = 'view-all-link';
+      viewAllBtn.textContent = 'View All →';
+      viewAllBtn.addEventListener('click', () => { location.hash = 'shop/' + encodeURIComponent(cat); });
+      head.append(h3, viewAllBtn);
+
+      const scrollWrap = document.createElement('div');
+      scrollWrap.className = 'row-scroll';
+      items.slice(0, ROW_LIMIT).forEach((p, i) => scrollWrap.appendChild(buildProductCard(p, i)));
+
+      rowWrap.append(head, scrollWrap);
+      categoryRowsEl.appendChild(rowWrap);
     });
+  }
+
+  function renderCategoryView(cat) {
+    const items = allProducts.filter(p => p.category === cat);
+    categoryViewTitle.textContent = cat;
+    categoryFullGrid.innerHTML = '';
+    if (!items.length) {
+      categoryFullGrid.innerHTML = '<p class="catalog-status">Nothing in this category right now — check back soon.</p>';
+    } else {
+      items.forEach((p, i) => categoryFullGrid.appendChild(buildProductCard(p, i)));
+    }
+    collectionHomeEl.hidden = true;
+    categoryViewEl.hidden = false;
+    document.getElementById('collection').scrollIntoView({ block: 'start' });
+  }
+
+  function showHome() {
+    categoryViewEl.hidden = true;
+    collectionHomeEl.hidden = false;
+  }
+
+  function handleRoute() {
+    const hash = location.hash.replace('#', '');
+    if (hash.indexOf('shop/') === 0) {
+      const cat = decodeURIComponent(hash.slice(5));
+      if (allProducts.some(p => p.category === cat)) {
+        renderCategoryView(cat);
+        return;
+      }
+    }
+    showHome();
+  }
+
+  backToCollectionBtn.addEventListener('click', () => { location.hash = ''; });
+  window.addEventListener('hashchange', handleRoute);
+
+  // ---------- Minimal CSV parser (handles quoted commas) ----------
+  function parseCsv(text) {
+    const rows = [];
+    let row = [], field = '', inQuotes = false;
+    for (let i = 0; i < text.length; i++) {
+      const c = text[i], next = text[i + 1];
+      if (inQuotes) {
+        if (c === '"' && next === '"') { field += '"'; i++; }
+        else if (c === '"') { inQuotes = false; }
+        else { field += c; }
+      } else {
+        if (c === '"') inQuotes = true;
+        else if (c === ',') { row.push(field); field = ''; }
+        else if (c === '\n' || c === '\r') {
+          if (c === '\r' && next === '\n') i++;
+          row.push(field); rows.push(row); row = []; field = '';
+        } else { field += c; }
+      }
+    }
+    if (field.length || row.length) { row.push(field); rows.push(row); }
+    return rows.filter(r => r.some(cell => cell.trim() !== ''));
+  }
+
+  function rowsToProducts(rows) {
+    if (!rows.length) return [];
+    const header = rows[0].map(h => h.trim().toLowerCase());
+    const idx = {
+      name: header.indexOf('name'),
+      category: header.indexOf('category'),
+      price: header.indexOf('price'),
+      photo: header.indexOf('photo_url'),
+      status: header.indexOf('status'),
+    };
+    return rows.slice(1).map(r => ({
+      name: (r[idx.name] || 'Unnamed piece').trim(),
+      category: (r[idx.category] || 'Other').trim(),
+      price: (r[idx.price] || '').trim(),
+      photo: (r[idx.photo] || '').trim(),
+      status: (r[idx.status] || 'active').trim().toLowerCase(),
+    })).filter(p => p.name);
   }
 
   function loadCatalog() {
     if (!CONFIG.sheetCsvUrl || CONFIG.sheetCsvUrl.indexOf('PASTE_YOUR') === 0) {
-      // Not configured yet — show the static fallback so the page never looks broken.
       allProducts = FALLBACK_PRODUCTS;
-      renderFilters();
-      renderProducts();
+      renderHome();
+      handleRoute();
       return;
     }
     fetch(CONFIG.sheetCsvUrl)
@@ -559,14 +680,14 @@
       .then(text => {
         const products = rowsToProducts(parseCsv(text));
         allProducts = products.length ? products : FALLBACK_PRODUCTS;
-        renderFilters();
-        renderProducts();
+        renderHome();
+        handleRoute();
       })
       .catch(err => {
         console.error('Catalog load failed, showing fallback:', err);
         allProducts = FALLBACK_PRODUCTS;
-        renderFilters();
-        renderProducts();
+        renderHome();
+        handleRoute();
       });
   }
 
