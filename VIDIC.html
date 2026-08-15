@@ -1,0 +1,517 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Vidic Boutique — Ahoufe Fie, Kumasi</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,600;12..96,700;12..96,800&family=Work+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --emerald:#0C4B3F;
+    --hero-bg:#083830;
+    --wine:#7A1F3D;
+    --gold:#C9962B;
+    --gold-light:#E4C878;
+    --on-gold:#1D1220;
+    --cream-fixed:#FDFBF7;
+    --footer-bg:#1D1220;
+    --bg:#FDFBF7;
+    --bg-rgb:253,251,247;
+    --surface:#F4EFE6;
+    --text:#1D1220;
+    --text-soft:#5A4E58;
+    --line: rgba(29,18,32,0.12);
+    --brand:#083830;
+  }
+  [data-theme="dark"]{
+    --bg:#16120F;
+    --bg-rgb:22,18,15;
+    --surface:#221B16;
+    --text:#F2ECE0;
+    --text-soft:#B9AC9C;
+    --line: rgba(242,236,224,0.14);
+    --brand:#E4C878;
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  html{scroll-behavior:smooth;}
+  body{
+    background:var(--bg); color:var(--text);
+    font-family:'Work Sans', sans-serif; line-height:1.5;
+    -webkit-font-smoothing:antialiased;
+    transition:background .25s ease, color .25s ease;
+  }
+  img,svg{display:block; max-width:100%;}
+  a{color:inherit; text-decoration:none;}
+  ul{list-style:none;}
+  .wrap{max-width:1180px; margin:0 auto; padding-inline:24px;}
+  h1,h2,h3{font-family:'Bricolage Grotesque', sans-serif; font-weight:700; letter-spacing:-0.01em;}
+  a:focus-visible, button:focus-visible{outline:3px solid var(--gold); outline-offset:3px; border-radius:2px;}
+
+  .tag{
+    display:inline-flex; align-items:center; gap:7px;
+    font-family:'IBM Plex Mono', monospace; font-size:12px; font-weight:600;
+    letter-spacing:0.06em; text-transform:uppercase;
+    padding:6px 12px 6px 10px; border:1.5px solid currentColor;
+    border-radius:3px 10px 10px 3px; position:relative; background:none; cursor:default;
+  }
+  .tag::before{content:""; width:6px; height:6px; border:1.5px solid currentColor; border-radius:50%; flex-shrink:0;}
+  button.tag{cursor:pointer; font:inherit; transition:background .15s ease, color .15s ease;}
+  button.tag[aria-pressed="true"]{background:var(--brand); color:var(--bg); border-color:var(--brand);}
+
+  .reveal{opacity:0; transform:translateY(18px); transition:opacity .6s ease, transform .6s ease;}
+  .reveal.is-visible{opacity:1; transform:translateY(0);}
+  .reveal-stagger.is-visible{transition-delay:var(--stagger, 0ms);}
+  @media (prefers-reduced-motion: reduce){.reveal{opacity:1; transform:none; transition:none;}}
+
+  header{
+    position:sticky; top:0; z-index:50;
+    background:rgba(var(--bg-rgb),0.92); backdrop-filter:blur(8px);
+    border-bottom:1px solid var(--line);
+    transition:background .25s ease, border-color .25s ease;
+  }
+  .nav-row{display:flex; align-items:center; justify-content:space-between; height:76px; gap:18px;}
+  .wordmark{font-family:'Bricolage Grotesque', sans-serif; font-weight:800; font-size:24px; letter-spacing:-0.02em; color:var(--brand); transition:color .25s ease;}
+  .wordmark span{color:var(--gold);}
+  nav{margin-right:auto;}
+  nav ul{display:flex; gap:32px; align-items:center; padding-left:48px;}
+  nav a{font-size:14px; font-weight:500; color:var(--text-soft); transition:color .15s;}
+  nav a:hover{color:var(--brand);}
+  .header-actions{display:flex; align-items:center; gap:12px;}
+  .btn{display:inline-flex; align-items:center; gap:8px; font-family:'Work Sans', sans-serif; font-weight:600; font-size:14px; padding:11px 20px; border-radius:6px; transition:transform .15s ease, box-shadow .15s ease; border:none; cursor:pointer;}
+  .btn:hover{transform:translateY(-1px);}
+  .btn-gold{background:var(--gold); color:var(--on-gold);}
+  .btn-gold:hover{box-shadow:0 6px 16px rgba(201,150,43,0.35);}
+  .btn-outline{border:1.5px solid var(--brand); color:var(--brand); background:none; transition:color .25s ease, border-color .25s ease, transform .15s ease;}
+  .menu-toggle{display:none; background:none; border:none; cursor:pointer;}
+
+  .theme-toggle{display:inline-flex; align-items:center; justify-content:center; width:40px; height:40px; border-radius:50%; border:1.5px solid var(--line); background:none; cursor:pointer; color:var(--text); transition:border-color .25s ease, transform .2s ease; flex-shrink:0;}
+  .theme-toggle:hover{transform:rotate(14deg);}
+  .theme-toggle svg{width:19px; height:19px;}
+  .theme-toggle .icon-moon{display:none;}
+  [data-theme="dark"] .theme-toggle .icon-sun{display:none;}
+  [data-theme="dark"] .theme-toggle .icon-moon{display:block;}
+
+  .hero{background:var(--hero-bg); color:var(--cream-fixed); padding:88px 0 0; overflow:hidden;}
+  .hero-grid{display:grid; grid-template-columns:1.1fr 0.9fr; gap:56px; align-items:center;}
+  .eyebrow-tag{color:var(--gold-light); margin-bottom:22px;}
+  .hero h1{font-size:clamp(40px, 5.6vw, 68px); line-height:1.02; color:var(--cream-fixed);}
+  .hero h1 em{font-style:normal; color:var(--gold-light);}
+  .hero p{margin-top:20px; font-size:17px; max-width:46ch; color:rgba(253,251,247,0.78);}
+  .hero-cta{display:flex; gap:14px; margin-top:34px; flex-wrap:wrap;}
+  .btn-hero-outline{border:1.5px solid rgba(253,251,247,0.4); color:var(--cream-fixed); background:none;}
+  .btn-hero-outline:hover{border-color:var(--gold-light);}
+  .hero-visual{position:relative; display:grid; grid-template-columns:1fr 1fr; gap:14px; padding-bottom:56px;}
+  .swatch{aspect-ratio:3/4; border-radius:10px; display:flex; align-items:flex-end; padding:14px; font-family:'IBM Plex Mono', monospace; font-size:11px; color:rgba(253,251,247,0.55); background-size:cover;}
+  .swatch span{background:rgba(8,56,48,0.55); padding:4px 8px; border-radius:4px; backdrop-filter:blur(2px);}
+  .sw1{background:repeating-linear-gradient(135deg, #145545, #145545 12px, #0C4B3F 12px, #0C4B3F 24px); margin-top:36px;}
+  .sw2{background:repeating-linear-gradient(45deg, #8C2A49, #8C2A49 12px, #7A1F3D 12px, #7A1F3D 24px);}
+  .sw3{background:repeating-linear-gradient(45deg, #D6AC4E, #D6AC4E 12px, #C9962B 12px, #C9962B 24px);}
+  .sw4{background:repeating-linear-gradient(135deg, #241830, #241830 12px, #1D1220 12px, #1D1220 24px); margin-top:36px;}
+
+  .strip{background:var(--gold); padding:14px 0; overflow:hidden; white-space:nowrap; border-bottom:1px solid var(--line);}
+  .strip-track{display:inline-flex; gap:40px; animation:scroll 26s linear infinite; font-family:'IBM Plex Mono', monospace; font-weight:600; font-size:13px; letter-spacing:0.08em; text-transform:uppercase; color:var(--on-gold);}
+  .strip-track span::after{content:"✦"; margin-left:40px; opacity:.5;}
+  @keyframes scroll{from{transform:translateX(0);} to{transform:translateX(-50%);}}
+  @media (prefers-reduced-motion: reduce){.strip-track{animation:none;}}
+
+  section{padding:88px 0;}
+  .section-head{display:flex; justify-content:space-between; align-items:flex-end; gap:24px; margin-bottom:32px; flex-wrap:wrap;}
+  .section-head h2{font-size:clamp(28px, 3.4vw, 40px); color:var(--brand); transition:color .25s ease;}
+  .section-head p{color:var(--text-soft); max-width:42ch; font-size:15px;}
+
+  .filter-row{display:flex; gap:10px; flex-wrap:wrap; margin-bottom:36px; color:var(--brand);}
+
+  .collection-grid{display:grid; grid-template-columns:repeat(4, 1fr); gap:20px; min-height:120px;}
+  .piece{background:var(--surface); border-radius:10px; overflow:hidden; border:1px solid var(--line); transition:transform .18s ease, box-shadow .18s ease, background .25s ease, border-color .25s ease; opacity:0; animation:pieceIn .5s ease forwards;}
+  @keyframes pieceIn{to{opacity:1;}}
+  @media (prefers-reduced-motion: reduce){.piece{animation:none; opacity:1;}}
+  .piece:hover{transform:translateY(-4px); box-shadow:0 14px 28px rgba(12,75,63,0.14);}
+  .piece.is-sold{opacity:0.55;}
+  .piece-photo{aspect-ratio:4/5; display:flex; align-items:center; justify-content:center; font-family:'IBM Plex Mono', monospace; font-size:11px; color:#5A4E58; text-align:center; padding:12px; background-size:cover; background-position:center; position:relative;}
+  .piece-photo .sold-badge{position:absolute; top:10px; right:10px; background:var(--footer-bg); color:var(--cream-fixed); font-family:'IBM Plex Mono',monospace; font-size:10px; text-transform:uppercase; letter-spacing:.06em; padding:4px 8px; border-radius:4px;}
+  .p-fallback-0{background:repeating-linear-gradient(120deg,#e3dccb,#e3dccb 10px,#d8cfb8 10px,#d8cfb8 20px);}
+  .p-fallback-1{background:repeating-linear-gradient(60deg,#efe2c9,#efe2c9 10px,#e6d5ac 10px,#e6d5ac 20px);}
+  .p-fallback-2{background:repeating-linear-gradient(120deg,#dfe0d6,#dfe0d6 10px,#d2d4c4 10px,#d2d4c4 20px);}
+  .p-fallback-3{background:repeating-linear-gradient(60deg,#e6d6db,#e6d6db 10px,#dcc4cc 10px,#dcc4cc 20px);}
+  .piece-info{padding:14px 16px 18px;}
+  .piece-info .tag{font-size:10px; padding:4px 9px 4px 7px; margin-bottom:10px; color:var(--brand); transition:color .25s ease;}
+  .piece-info h3{font-size:16px; font-weight:600; font-family:'Work Sans',sans-serif;}
+  .piece-info .price{margin-top:6px; font-family:'IBM Plex Mono', monospace; font-size:13px; color:var(--text-soft);}
+  .catalog-status{font-family:'IBM Plex Mono',monospace; font-size:12px; color:var(--text-soft); text-align:center; padding:32px; grid-column:1/-1;}
+  .catalog-status.is-error{color:#B23A3A;}
+
+  .tailoring{background:var(--wine); color:var(--cream-fixed);}
+  .tailoring-grid{display:grid; grid-template-columns:0.85fr 1.15fr; gap:56px; align-items:center;}
+  .tailoring .eyebrow-tag{color:var(--gold-light);}
+  .tailoring h2{color:var(--cream-fixed); font-size:clamp(28px,3.6vw,42px); margin-bottom:18px;}
+  .tailoring p{color:rgba(253,251,247,0.82); font-size:16px; max-width:52ch;}
+  .tailoring-steps{margin-top:28px; display:flex; flex-direction:column; gap:14px;}
+  .tailoring-step{display:flex; gap:14px; align-items:flex-start; font-size:14px; color:rgba(253,251,247,0.9);}
+  .tailoring-step .dot{width:8px; height:8px; border-radius:50%; background:var(--gold-light); margin-top:7px; flex-shrink:0;}
+  .tailoring-visual{aspect-ratio:1/1; border-radius:14px; background:repeating-linear-gradient(135deg, #8C2A49, #8C2A49 16px, #7A1F3D 16px, #7A1F3D 32px); display:flex; align-items:flex-end; padding:20px;}
+  .tailoring-visual span{font-family:'IBM Plex Mono',monospace; font-size:12px; background:rgba(29,18,32,0.4); padding:6px 10px; border-radius:5px; color:var(--cream-fixed);}
+
+  .proof{background:var(--surface); border-top:1px solid var(--line); border-bottom:1px solid var(--line); transition:background .25s ease, border-color .25s ease;}
+  .proof .wrap{display:grid; grid-template-columns:repeat(3,1fr); gap:32px; text-align:center; padding-block:56px;}
+  .proof-stat h3{font-size:clamp(30px,4vw,42px); color:var(--brand); transition:color .25s ease;}
+  .proof-stat p{font-size:13px; color:var(--text-soft); margin-top:6px; font-family:'IBM Plex Mono',monospace; text-transform:uppercase; letter-spacing:0.05em;}
+
+  footer{background:var(--footer-bg); color:var(--cream-fixed);}
+  .footer-grid{display:grid; grid-template-columns:1.2fr 0.8fr 0.8fr; gap:48px; padding:72px 0 40px;}
+  footer h2{color:var(--cream-fixed); font-size:clamp(26px,3.2vw,36px); margin-bottom:16px;}
+  footer p{color:rgba(253,251,247,0.65); font-size:15px; max-width:36ch;}
+  .footer-cta{margin-top:26px;}
+  .footer-col h4{font-family:'IBM Plex Mono',monospace; font-size:12px; text-transform:uppercase; letter-spacing:0.08em; color:var(--gold-light); margin-bottom:16px;}
+  .footer-col a, .footer-col p{display:block; font-size:14px; color:rgba(253,251,247,0.75); margin-bottom:10px;}
+  .footer-col a:hover{color:var(--gold-light);}
+  .footer-bottom{border-top:1px solid rgba(253,251,247,0.12); padding:22px 0; font-size:12px; color:rgba(253,251,247,0.45); display:flex; justify-content:space-between; flex-wrap:wrap; gap:8px;}
+
+  @media (max-width:920px){
+    nav ul{display:none;} .menu-toggle{display:block;}
+    .hero-grid, .tailoring-grid{grid-template-columns:1fr;}
+    .hero-visual{padding-bottom:0; margin-top:36px;}
+    .collection-grid{grid-template-columns:repeat(2,1fr);}
+    .proof .wrap{grid-template-columns:1fr; gap:28px;}
+    .footer-grid{grid-template-columns:1fr; gap:36px;}
+  }
+  @media (max-width:520px){
+    .hero-cta .btn{width:100%; justify-content:center;}
+    section{padding:60px 0;}
+  }
+</style>
+</head>
+<body>
+
+<!--
+  ============================================================
+  REUSABLE TEMPLATE — CONFIG
+  To reuse this for a different client: change the values in
+  the CONFIG object near the bottom <script> tag, and swap the
+  --emerald/--wine/--gold/--hero-bg color values above if their
+  brand needs a different palette. Everything else (layout,
+  motion, dark mode, catalog logic) stays as-is.
+  ============================================================
+-->
+
+<header>
+  <div class="wrap nav-row">
+    <a href="#top" class="wordmark">VID<span>I</span>C</a>
+    <nav>
+      <ul>
+        <li><a href="#collection">Collection</a></li>
+        <li><a href="#tailoring">Custom Tailoring</a></li>
+        <li><a href="#proof">About</a></li>
+        <li><a href="#contact">Contact</a></li>
+      </ul>
+    </nav>
+    <div class="header-actions">
+      <button class="theme-toggle" id="themeToggle" aria-pressed="false" aria-label="Toggle dark mode">
+        <svg class="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>
+        <svg class="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+      </button>
+      <a class="btn btn-gold" data-wa-link href="#" target="_blank" rel="noopener">Chat on WhatsApp</a>
+      <button class="menu-toggle" aria-label="Open menu">☰</button>
+    </div>
+  </div>
+</header>
+
+<section class="hero" id="top">
+  <div class="wrap hero-grid">
+    <div>
+      <span class="tag eyebrow-tag">Patasi · Mango Down · Kumasi</span>
+      <h1>Ahoufe Fie —<br><em>the house of beauty.</em></h1>
+      <p>Ready-to-wear pieces, statement bags and shoes, and custom-made fashion under Gerram by Vidic. Same styles your followers already love — now one link away from a fitting.</p>
+      <div class="hero-cta">
+        <a class="btn btn-gold" data-wa-link href="#" target="_blank" rel="noopener">Shop the Collection</a>
+        <a class="btn btn-hero-outline" href="#tailoring">Book a Custom Fitting</a>
+      </div>
+    </div>
+    <div class="hero-visual">
+      <div class="swatch sw1"><span>photo — statement pieces</span></div>
+      <div class="swatch sw2"><span>photo — footwear</span></div>
+      <div class="swatch sw3"><span>photo — bags</span></div>
+      <div class="swatch sw4"><span>photo — custom fits</span></div>
+    </div>
+  </div>
+</section>
+
+<div class="strip" aria-hidden="true">
+  <div class="strip-track">
+    <span>Ready-to-Wear</span><span>Shoes</span><span>Bags</span><span>Jumpsuits</span><span>Custom Tailoring</span>
+    <span>Ready-to-Wear</span><span>Shoes</span><span>Bags</span><span>Jumpsuits</span><span>Custom Tailoring</span>
+  </div>
+</div>
+
+<section id="collection">
+  <div class="wrap">
+    <div class="section-head reveal">
+      <div>
+        <h2>This week's collection</h2>
+        <p>Pulled live from Vidic's own stock sheet — updated by the shop, not by us.</p>
+      </div>
+      <a class="btn btn-outline" data-wa-link href="#" target="_blank" rel="noopener">See full range on WhatsApp</a>
+    </div>
+    <div class="filter-row" id="filterRow" aria-label="Filter by category"></div>
+    <div class="collection-grid" id="collectionGrid">
+      <p class="catalog-status" id="catalogStatus">Loading the current collection…</p>
+    </div>
+  </div>
+</section>
+
+<section class="tailoring" id="tailoring">
+  <div class="wrap tailoring-grid">
+    <div class="tailoring-visual reveal"><span>photo — fitting session</span></div>
+    <div class="reveal">
+      <span class="tag eyebrow-tag">Gerram Fashion · Vicdic Fashion Design</span>
+      <h2>Made for your exact measurements, not the rack.</h2>
+      <p>Bring a design idea, a fabric, or just an occasion — Vidic's in-house design team builds it around you, from first fitting to final piece.</p>
+      <div class="tailoring-steps">
+        <div class="tailoring-step"><span class="dot"></span>Send your fabric or pick from what's in store</div>
+        <div class="tailoring-step"><span class="dot"></span>Book a fitting at the Patasi shop</div>
+        <div class="tailoring-step"><span class="dot"></span>Collect your finished piece, made to size</div>
+      </div>
+      <div class="hero-cta">
+        <a class="btn btn-gold" data-wa-link href="#" target="_blank" rel="noopener">Start a Custom Order</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="proof" id="proof">
+  <div class="wrap">
+    <div class="proof-stat reveal reveal-stagger" style="--stagger:0ms">
+      <h3>3,500+</h3><p>Instagram followers</p>
+    </div>
+    <div class="proof-stat reveal reveal-stagger" style="--stagger:100ms">
+      <h3>51K+</h3><p>Facebook community</p>
+    </div>
+    <div class="proof-stat reveal reveal-stagger" style="--stagger:200ms">
+      <h3>Kumasi City Mall</h3><p>Grand opening, hosted with Salma Mumin</p>
+    </div>
+  </div>
+</section>
+
+<footer id="contact">
+  <div class="wrap footer-grid">
+    <div class="reveal">
+      <h2>Come see us, or start on WhatsApp.</h2>
+      <p>Most orders start with a message — send a photo of what you want and we'll take it from there.</p>
+      <div class="footer-cta">
+        <a class="btn btn-gold" data-wa-link href="#" target="_blank" rel="noopener">Message Vidic on WhatsApp</a>
+      </div>
+    </div>
+    <div class="footer-col reveal">
+      <h4>Visit</h4>
+      <p>Patasi, Mango Down<br>Near Assemblies of God<br>Upper Room Church, Kumasi</p>
+    </div>
+    <div class="footer-col reveal">
+      <h4>Contact</h4>
+      <a href="tel:+233244464345">024 446 4345</a>
+      <a href="tel:+233542015475">054 201 5475</a>
+      <a href="tel:+233552500231">055 250 0231</a>
+      <a href="https://instagram.com/vidicbutik" target="_blank" rel="noopener">@vidicbutik</a>
+    </div>
+  </div>
+  <div class="wrap footer-bottom">
+    <span>© 2026 Vidic Boutique — Kumasi, Ghana</span>
+    <span>Prototype built by Darlington</span>
+  </div>
+</footer>
+
+<script>
+  // ============================================================
+  // CONFIG — everything client-specific lives here.
+  // To reuse this template for a different business, change
+  // these four values (plus the CSS color tokens up top).
+  // ============================================================
+  const CONFIG = {
+    businessName: "Vidic Boutique",
+    whatsappNumber: "233244464345", // digits only, country code, no +
+    // Publish your Google Sheet: File > Share > Publish to web > CSV
+    // Paste the resulting link below.
+    sheetCsvUrl: "https://docs.google.com/spreadsheets/d/e/2PACX-1vQipIEWyaTdByuEV2xMp1yVbgzZlOIuBrC2WeVUYI-58_-HhqmBB9W7m2Y-Qz6MB_RQLWhsZoYy_vdN/pub?output=csv",
+    // Expected columns in the sheet, in this exact order:
+    // name, category, price, photo_url, status
+    // status should be the word "active" or "sold"
+  };
+
+  // Wire up every WhatsApp link on the page from one config value.
+  document.querySelectorAll('[data-wa-link]').forEach(function(el){
+    el.href = 'https://wa.me/' + CONFIG.whatsappNumber;
+  });
+
+  // ---------- Minimal CSV parser (handles quoted commas) ----------
+  function parseCsv(text) {
+    const rows = [];
+    let row = [], field = '', inQuotes = false;
+    for (let i = 0; i < text.length; i++) {
+      const c = text[i], next = text[i + 1];
+      if (inQuotes) {
+        if (c === '"' && next === '"') { field += '"'; i++; }
+        else if (c === '"') { inQuotes = false; }
+        else { field += c; }
+      } else {
+        if (c === '"') inQuotes = true;
+        else if (c === ',') { row.push(field); field = ''; }
+        else if (c === '\n' || c === '\r') {
+          if (c === '\r' && next === '\n') i++;
+          row.push(field); rows.push(row); row = []; field = '';
+        } else { field += c; }
+      }
+    }
+    if (field.length || row.length) { row.push(field); rows.push(row); }
+    return rows.filter(r => r.some(cell => cell.trim() !== ''));
+  }
+
+  function rowsToProducts(rows) {
+    if (!rows.length) return [];
+    const header = rows[0].map(h => h.trim().toLowerCase());
+    const idx = {
+      name: header.indexOf('name'),
+      category: header.indexOf('category'),
+      price: header.indexOf('price'),
+      photo: header.indexOf('photo_url'),
+      status: header.indexOf('status'),
+    };
+    return rows.slice(1).map(r => ({
+      name: (r[idx.name] || 'Unnamed piece').trim(),
+      category: (r[idx.category] || 'Other').trim(),
+      price: (r[idx.price] || '').trim(),
+      photo: (r[idx.photo] || '').trim(),
+      status: (r[idx.status] || 'active').trim().toLowerCase(),
+    })).filter(p => p.name);
+  }
+
+  // ---------- Fallback demo pieces, shown if the sheet isn't connected yet ----------
+  const FALLBACK_PRODUCTS = [
+    { name: 'Ankara Wrap Set', category: 'Ready-to-Wear', price: 'GH₵ —', photo: '', status: 'active' },
+    { name: 'Heeled Sandals', category: 'Footwear', price: 'GH₵ —', photo: '', status: 'active' },
+    { name: 'Structured Tote', category: 'Bags', price: 'GH₵ —', photo: '', status: 'active' },
+    { name: 'Tailored Jumpsuit', category: 'Jumpsuits', price: 'GH₵ —', photo: '', status: 'active' },
+  ];
+
+  const grid = document.getElementById('collectionGrid');
+  const statusEl = document.getElementById('catalogStatus');
+  const filterRow = document.getElementById('filterRow');
+  let allProducts = [];
+  let activeFilter = 'All';
+
+  function renderProducts() {
+    const list = activeFilter === 'All'
+      ? allProducts
+      : allProducts.filter(p => p.category === activeFilter);
+
+    grid.innerHTML = '';
+    if (!list.length) {
+      grid.innerHTML = '<p class="catalog-status">Nothing in this category right now — check back soon.</p>';
+      return;
+    }
+    list.forEach((p, i) => {
+      const card = document.createElement('div');
+      card.className = 'piece' + (p.status === 'sold' ? ' is-sold' : '');
+      card.style.animationDelay = Math.min(i, 8) * 40 + 'ms';
+
+      const photoClass = p.photo ? '' : ' p-fallback-' + (i % 4);
+      const photoStyle = p.photo ? ' style="background-image:url(\'' + p.photo.replace(/'/g, "%27") + '\')"' : '';
+
+      card.innerHTML =
+        '<div class="piece-photo' + photoClass + '"' + photoStyle + '>' +
+          (p.photo ? '' : 'product photo') +
+          (p.status === 'sold' ? '<span class="sold-badge">Sold out</span>' : '') +
+        '</div>' +
+        '<div class="piece-info">' +
+          '<span class="tag">' + escapeHtml(p.category) + '</span>' +
+          '<h3>' + escapeHtml(p.name) + '</h3>' +
+          '<p class="price">' + escapeHtml(p.price || 'Ask on WhatsApp') + '</p>' +
+        '</div>';
+      grid.appendChild(card);
+    });
+  }
+
+  function escapeHtml(str) {
+    const div = document.createElement('div');
+    div.textContent = str;
+    return div.innerHTML;
+  }
+
+  function renderFilters() {
+    const categories = ['All', ...new Set(allProducts.map(p => p.category))];
+    filterRow.innerHTML = '';
+    categories.forEach(cat => {
+      const btn = document.createElement('button');
+      btn.className = 'tag';
+      btn.type = 'button';
+      btn.textContent = cat;
+      btn.setAttribute('aria-pressed', cat === activeFilter ? 'true' : 'false');
+      btn.addEventListener('click', () => {
+        activeFilter = cat;
+        filterRow.querySelectorAll('button').forEach(b => b.setAttribute('aria-pressed', b === btn ? 'true' : 'false'));
+        renderProducts();
+      });
+      filterRow.appendChild(btn);
+    });
+  }
+
+  function loadCatalog() {
+    if (!CONFIG.sheetCsvUrl || CONFIG.sheetCsvUrl.indexOf('PASTE_YOUR') === 0) {
+      // Not configured yet — show the static fallback so the page never looks broken.
+      allProducts = FALLBACK_PRODUCTS;
+      renderFilters();
+      renderProducts();
+      return;
+    }
+    fetch(CONFIG.sheetCsvUrl)
+      .then(res => {
+        if (!res.ok) throw new Error('Sheet request failed: ' + res.status);
+        return res.text();
+      })
+      .then(text => {
+        const products = rowsToProducts(parseCsv(text));
+        allProducts = products.length ? products : FALLBACK_PRODUCTS;
+        renderFilters();
+        renderProducts();
+      })
+      .catch(err => {
+        console.error('Catalog load failed, showing fallback:', err);
+        allProducts = FALLBACK_PRODUCTS;
+        renderFilters();
+        renderProducts();
+      });
+  }
+
+  loadCatalog();
+
+  // ---------- Dark mode toggle ----------
+  (function(){
+    var root = document.documentElement;
+    var btn = document.getElementById('themeToggle');
+    var stored = null;
+    try { stored = localStorage.getItem('vidic-theme'); } catch(e) {}
+    var prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+    var initial = stored || (prefersDark ? 'dark' : 'light');
+    if (initial === 'dark') { root.setAttribute('data-theme', 'dark'); btn.setAttribute('aria-pressed', 'true'); }
+    btn.addEventListener('click', function(){
+      var isDark = root.getAttribute('data-theme') === 'dark';
+      if (isDark) { root.removeAttribute('data-theme'); btn.setAttribute('aria-pressed', 'false'); }
+      else { root.setAttribute('data-theme', 'dark'); btn.setAttribute('aria-pressed', 'true'); }
+      try { localStorage.setItem('vidic-theme', isDark ? 'light' : 'dark'); } catch(e) {}
+    });
+  })();
+
+  // ---------- Scroll reveal ----------
+  (function(){
+    var items = document.querySelectorAll('.reveal');
+    if (!('IntersectionObserver' in window)) { items.forEach(el => el.classList.add('is-visible')); return; }
+    var observer = new IntersectionObserver(function(entries){
+      entries.forEach(function(entry){
+        if (entry.isIntersecting) { entry.target.classList.add('is-visible'); observer.unobserve(entry.target); }
+      });
+    }, { threshold: 0.15, rootMargin: '0px 0px -40px 0px' });
+    items.forEach(el => observer.observe(el));
+  })();
+</script>
+
+</body>
+</html>
