@@ -507,9 +507,14 @@
   }
   @keyframes pieceIn { to { opacity: 1; } }
   @media (prefers-reduced-motion: reduce) { .piece { animation: none; opacity: 1; } }
-  .piece:hover { 
+  .piece:hover, .piece:focus-visible, .piece.is-selected { 
     transform: translateY(-4px); 
     box-shadow: var(--shadow-md); 
+    outline: none;
+  }
+  .piece:focus-visible, .piece.is-selected {
+    outline: 3px solid var(--gold);
+    outline-offset: 3px;
   }
   .piece.is-sold { opacity: 0.55; }
   
@@ -1113,11 +1118,18 @@
   let allProducts = [];
   const ROW_LIMIT = 8;
 
+  function isMobileDevice() {
+    return window.matchMedia('(max-width: 920px)').matches || ('ontouchstart' in window) || (navigator.maxTouchPoints > 0);
+  }
+
   // Builds one product card. Reused by both the horizontal rows and the grid view
   function buildProductCard(p, i) {
     const card = document.createElement('div');
     card.className = 'piece' + (p.status === 'sold' ? ' is-sold' : '');
     card.style.animationDelay = Math.min(i, 8) * 40 + 'ms';
+    card.setAttribute('tabindex', '0');
+    card.setAttribute('role', 'button');
+    card.setAttribute('aria-label', p.name + ' - Price: ' + (p.price || 'Ask on WhatsApp') + '. Double click or press Enter to view photo.');
 
     const fallbackClass = 'p-fallback-' + (i % 4);
     const photoDiv = document.createElement('div');
@@ -1149,17 +1161,34 @@
         showFallback();
       };
       photoDiv.classList.add('is-zoomable');
-      photoDiv.setAttribute('role', 'button');
-      photoDiv.setAttribute('tabindex', '0');
-      photoDiv.setAttribute('aria-label', 'View larger photo of ' + p.name);
-      photoDiv.addEventListener('click', function(){ openLightbox(p.photo, p.name); });
-      photoDiv.addEventListener('keydown', function(e){
-        if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); openLightbox(p.photo, p.name); }
-      });
       photoDiv.prepend(img);
     } else {
       showFallback();
     }
+
+    // Single-click select on PC, open on mobile
+    card.addEventListener('click', function(e) {
+      if (isMobileDevice()) {
+        if (p.photo) openLightbox(p.photo, p.name);
+      } else {
+        selectAndFocus(card);
+      }
+    });
+
+    // Double-click open on PC
+    card.addEventListener('dblclick', function() {
+      if (!isMobileDevice() && p.photo) {
+        openLightbox(p.photo, p.name);
+      }
+    });
+
+    // Keyboard Enter/Space open
+    card.addEventListener('keydown', function(e) {
+      if ((e.key === 'Enter' || e.key === ' ') && p.photo) {
+        e.preventDefault();
+        openLightbox(p.photo, p.name);
+      }
+    });
 
     const infoDiv = document.createElement('div');
     infoDiv.className = 'piece-info';
@@ -1185,6 +1214,58 @@
     const seen = [];
     allProducts.forEach(p => { if (!seen.includes(p.category)) seen.push(p.category); });
     return seen;
+  }
+
+  // ---------- Auto-Scroll for Product Rows (Interruptible & Continuous Smooth) ----------
+  function initAutoScroll(container) {
+    let animationFrameId = null;
+    let lastTime = 0;
+    let userInteractedTime = 0;
+    let isHovered = false;
+    const speed = 25; // Continuous scroll speed in pixels per second
+
+    function scrollStep(timestamp) {
+      if (!lastTime) lastTime = timestamp;
+      const dt = (timestamp - lastTime) / 1000; // Delta time in seconds
+      lastTime = timestamp;
+
+      // Pause scroll if hovered or manual interaction occurred within last 6 seconds
+      const isInteracting = isHovered || (Date.now() - userInteractedTime < 6000);
+
+      if (isInteracting) {
+        // Re-enable snapping rules for active manual scrolling
+        container.style.scrollSnapType = 'x proximity';
+      } else {
+        // Disable snapping rules for ultra-smooth continuous scroll movement
+        container.style.scrollSnapType = 'none';
+
+        const maxScroll = container.scrollWidth - container.clientWidth;
+        if (maxScroll > 0) {
+          container.scrollLeft += speed * dt;
+
+          // Seamless loop back to the start
+          if (container.scrollLeft >= maxScroll - 1) {
+            container.scrollLeft = 0;
+          }
+        }
+      }
+
+      animationFrameId = requestAnimationFrame(scrollStep);
+    }
+
+    container.addEventListener('mouseenter', () => { isHovered = true; });
+    container.addEventListener('mouseleave', () => { 
+      isHovered = false; 
+      userInteractedTime = Date.now(); 
+    });
+
+    const recordInteraction = () => { userInteractedTime = Date.now(); };
+    container.addEventListener('touchstart', recordInteraction, { passive: true });
+    container.addEventListener('mousedown', recordInteraction);
+    container.addEventListener('wheel', recordInteraction, { passive: true });
+
+    // Start the animation loop
+    animationFrameId = requestAnimationFrame(scrollStep);
   }
 
   function renderHome() {
@@ -1215,6 +1296,9 @@
 
       rowWrap.append(head, scrollWrap);
       categoryRowsEl.appendChild(rowWrap);
+
+      // Initialize automatic sliding scroll on the row
+      initAutoScroll(scrollWrap);
     });
   }
 
@@ -1259,7 +1343,9 @@
       handleRoute();
       return;
     }
-    fetch(CONFIG.sheetCsvUrl)
+    fetch(CONFIG.sheetCsvUrl + (CONFIG.sheetCsvUrl.indexOf('?') > -1 ? '&' : '?') + 't=' + Date.now(), {
+      cache: 'no-store'
+    })
       .then(res => {
         if (!res.ok) throw new Error('Sheet request failed: ' + res.status);
         return res.text();
@@ -1370,6 +1456,80 @@
     }, { threshold: 0.15, rootMargin: '0px 0px -40px 0px' });
     items.forEach(el => observer.observe(el));
   })();
+
+  // ---------- PC Keyboard Selection and Grid Navigation ----------
+  function selectAndFocus(card) {
+    if (!card) return;
+    document.querySelectorAll('.piece.is-selected').forEach(c => c.classList.remove('is-selected'));
+    card.classList.add('is-selected');
+    card.focus();
+    
+    // Smooth scroll current row to keep the focused item centered/visible
+    card.scrollIntoView({ block: 'nearest', inline: 'nearest' });
+  }
+
+  function moveSelection(activeCard, direction) {
+    const isCategoryView = !categoryViewEl.hidden;
+    
+    if (isCategoryView) {
+      // 4-Column Grid Navigation (Category Full Grid)
+      const cards = Array.from(categoryFullGrid.querySelectorAll('.piece'));
+      const currentIndex = cards.indexOf(activeCard);
+      if (currentIndex === -1) return;
+
+      let targetIndex = currentIndex;
+      if (direction === 'ArrowRight') targetIndex = currentIndex + 1;
+      else if (direction === 'ArrowLeft') targetIndex = currentIndex - 1;
+      else if (direction === 'ArrowDown') targetIndex = currentIndex + 4;
+      else if (direction === 'ArrowUp') targetIndex = currentIndex - 4;
+
+      if (targetIndex >= 0 && targetIndex < cards.length) {
+        selectAndFocus(cards[targetIndex]);
+      }
+    } else {
+      // Horizontal Rows & Vertical Categories Navigation
+      const currentRow = activeCard.closest('.category-row');
+      if (!currentRow) return;
+      
+      const cardsInRow = Array.from(currentRow.querySelectorAll('.piece'));
+      const currentIndex = cardsInRow.indexOf(activeCard);
+      if (currentIndex === -1) return;
+
+      if (direction === 'ArrowRight' && currentIndex + 1 < cardsInRow.length) {
+        selectAndFocus(cardsInRow[currentIndex + 1]);
+      } else if (direction === 'ArrowLeft' && currentIndex - 1 >= 0) {
+        selectAndFocus(cardsInRow[currentIndex - 1]);
+      } else if (direction === 'ArrowDown' || direction === 'ArrowUp') {
+        // Move between category rows at the same column index
+        const allRows = Array.from(categoryRowsEl.querySelectorAll('.category-row'));
+        const currentRowIndex = allRows.indexOf(currentRow);
+        if (currentRowIndex === -1) return;
+
+        let targetRowIndex = direction === 'ArrowDown' ? currentRowIndex + 1 : currentRowIndex - 1;
+        if (targetRowIndex >= 0 && targetRowIndex < allRows.length) {
+          const targetRow = allRows[targetRowIndex];
+          const targetRowCards = targetRow.querySelectorAll('.piece');
+          if (targetRowCards.length > 0) {
+            const targetCard = targetRowCards[Math.min(currentIndex, targetRowCards.length - 1)];
+            selectAndFocus(targetCard);
+          }
+        }
+      }
+    }
+  }
+
+  window.addEventListener('keydown', function(e) {
+    // Disable keyboard navigation when lightbox modal is active
+    if (!lightbox.hidden) return;
+
+    const active = document.activeElement;
+    if (!active || !active.classList.contains('piece')) return;
+
+    if (['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown'].includes(e.key)) {
+      e.preventDefault(); // Stop standard window scrolling
+      moveSelection(active, e.key);
+    }
+  });
 </script>
 
 </body>
