@@ -129,8 +129,10 @@
   @media (prefers-reduced-motion: reduce){.piece{animation:none; opacity:1;}}
   .piece:hover{transform:translateY(-4px); box-shadow:0 14px 28px rgba(12,75,63,0.14);}
   .piece.is-sold{opacity:0.55;}
-  .piece-photo{aspect-ratio:4/5; display:flex; align-items:center; justify-content:center; font-family:'IBM Plex Mono', monospace; font-size:11px; color:#5A4E58; text-align:center; padding:12px; background-size:cover; background-position:center; position:relative;}
-  .piece-photo .sold-badge{position:absolute; top:10px; right:10px; background:var(--footer-bg); color:var(--cream-fixed); font-family:'IBM Plex Mono',monospace; font-size:10px; text-transform:uppercase; letter-spacing:.06em; padding:4px 8px; border-radius:4px;}
+  .piece-photo{aspect-ratio:4/5; display:flex; align-items:center; justify-content:center; font-family:'IBM Plex Mono', monospace; font-size:11px; color:#5A4E58; text-align:center; padding:12px; position:relative; overflow:hidden;}
+  .piece-photo img{position:absolute; inset:0; width:100%; height:100%; object-fit:cover;}
+  .piece-photo .photo-fallback-label{position:relative; z-index:1;}
+  .piece-photo .sold-badge{position:absolute; top:10px; right:10px; z-index:2; background:var(--footer-bg); color:var(--cream-fixed); font-family:'IBM Plex Mono',monospace; font-size:10px; text-transform:uppercase; letter-spacing:.06em; padding:4px 8px; border-radius:4px;}
   .p-fallback-0{background:repeating-linear-gradient(120deg,#e3dccb,#e3dccb 10px,#d8cfb8 10px,#d8cfb8 20px);}
   .p-fallback-1{background:repeating-linear-gradient(60deg,#efe2c9,#efe2c9 10px,#e6d5ac 10px,#e6d5ac 20px);}
   .p-fallback-2{background:repeating-linear-gradient(120deg,#dfe0d6,#dfe0d6 10px,#d2d4c4 10px,#d2d4c4 20px);}
@@ -331,7 +333,7 @@
     whatsappNumber: "233244464345", // digits only, country code, no +
     // Publish your Google Sheet: File > Share > Publish to web > CSV
     // Paste the resulting link below.
-    sheetCsvUrl: "https://docs.google.com/spreadsheets/d/e/2PACX-1vQipIEWyaTdByuEV2xMp1yVbgzZlOIuBrC2WeVUYI-58_-HhqmBB9W7m2Y-Qz6MB_RQLWhsZoYy_vdN/pub?output=csv",
+    sheetCsvUrl: "PASTE_YOUR_PUBLISHED_GOOGLE_SHEET_CSV_LINK_HERE",
     // Expected columns in the sheet, in this exact order:
     // name, category, price, photo_url, status
     // status should be the word "active" or "sold"
@@ -413,19 +415,55 @@
       card.className = 'piece' + (p.status === 'sold' ? ' is-sold' : '');
       card.style.animationDelay = Math.min(i, 8) * 40 + 'ms';
 
-      const photoClass = p.photo ? '' : ' p-fallback-' + (i % 4);
-      const photoStyle = p.photo ? ' style="background-image:url(\'' + p.photo.replace(/'/g, "%27") + '\')"' : '';
+      const fallbackClass = 'p-fallback-' + (i % 4);
+      const photoDiv = document.createElement('div');
+      photoDiv.className = 'piece-photo';
 
-      card.innerHTML =
-        '<div class="piece-photo' + photoClass + '"' + photoStyle + '>' +
-          (p.photo ? '' : 'product photo') +
-          (p.status === 'sold' ? '<span class="sold-badge">Sold out</span>' : '') +
-        '</div>' +
-        '<div class="piece-info">' +
-          '<span class="tag">' + escapeHtml(p.category) + '</span>' +
-          '<h3>' + escapeHtml(p.name) + '</h3>' +
-          '<p class="price">' + escapeHtml(p.price || 'Ask on WhatsApp') + '</p>' +
-        '</div>';
+      if (p.status === 'sold') {
+        const badge = document.createElement('span');
+        badge.className = 'sold-badge';
+        badge.textContent = 'Sold out';
+        photoDiv.appendChild(badge);
+      }
+
+      function showFallback() {
+        photoDiv.classList.add(fallbackClass);
+        const label = document.createElement('span');
+        label.className = 'photo-fallback-label';
+        label.textContent = p.photo ? 'photo link broken' : 'product photo';
+        photoDiv.prepend(label);
+      }
+
+      if (p.photo) {
+        const img = document.createElement('img');
+        img.loading = 'lazy';
+        img.alt = p.name;
+        img.src = p.photo;
+        img.onerror = function () {
+          img.remove();
+          showFallback();
+        };
+        photoDiv.prepend(img);
+      } else {
+        showFallback();
+      }
+
+      const infoDiv = document.createElement('div');
+      infoDiv.className = 'piece-info';
+
+      const tagSpan = document.createElement('span');
+      tagSpan.className = 'tag';
+      tagSpan.textContent = p.category;
+
+      const nameH3 = document.createElement('h3');
+      nameH3.textContent = p.name;
+
+      const priceP = document.createElement('p');
+      priceP.className = 'price';
+      priceP.textContent = p.price || 'Ask on WhatsApp';
+
+      infoDiv.append(tagSpan, nameH3, priceP);
+      card.append(photoDiv, infoDiv);
       grid.appendChild(card);
     });
   }
