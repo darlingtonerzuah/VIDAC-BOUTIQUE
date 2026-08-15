@@ -133,6 +133,33 @@
   .piece-photo img{position:absolute; top:0; right:0; bottom:0; left:0; width:100%; height:100%; object-fit:cover;}
   .piece-photo .photo-fallback-label{position:relative; z-index:1;}
   .piece-photo .sold-badge{position:absolute; top:10px; right:10px; z-index:2; background:var(--footer-bg); color:var(--cream-fixed); font-family:'IBM Plex Mono',monospace; font-size:10px; text-transform:uppercase; letter-spacing:.06em; padding:4px 8px; border-radius:4px;}
+  .piece-photo.is-zoomable{cursor:zoom-in;}
+  .piece-photo.is-zoomable::after{
+    content:"⤢"; position:absolute; bottom:8px; right:8px; z-index:2;
+    width:26px; height:26px; border-radius:50%;
+    background:rgba(29,18,32,0.55); color:#FDFBF7;
+    display:flex; align-items:center; justify-content:center;
+    font-size:13px; opacity:0; transition:opacity .15s ease;
+  }
+  .piece-photo.is-zoomable:hover::after, .piece-photo.is-zoomable:focus-visible::after{opacity:1;}
+  .piece-photo.is-zoomable:focus-visible{outline:3px solid var(--gold); outline-offset:-3px;}
+
+  .lightbox{
+    position:fixed; inset:0; z-index:200;
+    background:rgba(10,7,9,0.92);
+    display:flex; flex-direction:column; align-items:center; justify-content:center;
+    padding:40px 20px; gap:16px;
+  }
+  .lightbox[hidden]{display:none;}
+  .lightbox img{max-width:min(90vw, 640px); max-height:75vh; border-radius:8px; object-fit:contain;}
+  .lightbox-caption{color:#F2ECE0; font-family:'Work Sans',sans-serif; font-size:14px;}
+  .lightbox-close{
+    position:absolute; top:20px; right:20px;
+    width:44px; height:44px; border-radius:50%;
+    background:rgba(255,255,255,0.1); color:#FDFBF7; border:1.5px solid rgba(255,255,255,0.25);
+    font-size:26px; line-height:1; cursor:pointer;
+  }
+  .lightbox-close:hover{background:rgba(255,255,255,0.2);}
   .p-fallback-0{background:repeating-linear-gradient(120deg,#e3dccb,#e3dccb 10px,#d8cfb8 10px,#d8cfb8 20px);}
   .p-fallback-1{background:repeating-linear-gradient(60deg,#efe2c9,#efe2c9 10px,#e6d5ac 10px,#e6d5ac 20px);}
   .p-fallback-2{background:repeating-linear-gradient(120deg,#dfe0d6,#dfe0d6 10px,#d2d4c4 10px,#d2d4c4 20px);}
@@ -161,7 +188,7 @@
   .proof-stat p{font-size:13px; color:var(--text-soft); margin-top:6px; font-family:'IBM Plex Mono',monospace; text-transform:uppercase; letter-spacing:0.05em;}
 
   footer{background:var(--footer-bg); color:var(--cream-fixed);}
-  .footer-grid{display:grid; grid-template-columns:1.2fr 0.8fr 0.8fr; gap:48px; padding:72px 0 40px;}
+  .footer-grid{display:grid; grid-template-columns:1.3fr 0.75fr 0.75fr 0.9fr; gap:40px; padding:72px 0 40px;}
   footer h2{color:var(--cream-fixed); font-size:clamp(26px,3.2vw,36px); margin-bottom:16px;}
   footer p{color:rgba(253,251,247,0.65); font-size:15px; max-width:36ch;}
   .footer-cta{margin-top:26px;}
@@ -176,7 +203,11 @@
     .hero-visual{padding-bottom:0; margin-top:36px;}
     .collection-grid{grid-template-columns:repeat(2,1fr);}
     .proof .wrap{grid-template-columns:1fr; gap:28px;}
-    .footer-grid{grid-template-columns:1fr; gap:36px;}
+    .footer-grid{grid-template-columns:1fr; gap:36px; text-align:center;}
+    .footer-grid p{max-width:none; margin-left:auto; margin-right:auto;}
+    .footer-cta{display:flex; justify-content:center;}
+    .footer-col h4{margin-top:8px;}
+    .footer-bottom{justify-content:center; text-align:center;}
   }
   @media (max-width:520px){
     .hero-cta .btn{width:100%; justify-content:center;}
@@ -284,7 +315,7 @@
 <section class="proof" id="proof">
   <div class="wrap">
     <div class="proof-stat reveal reveal-stagger" style="--stagger:0ms">
-      <h3>3,500+</h3><p>Instagram followers</p>
+      <h3>38K+</h3><p>Instagram followers</p>
     </div>
     <div class="proof-stat reveal reveal-stagger" style="--stagger:100ms">
       <h3>51K+</h3><p>Facebook community</p>
@@ -309,11 +340,16 @@
       <p>Patasi, Mango Down<br>Near Assemblies of God<br>Upper Room Church, Kumasi</p>
     </div>
     <div class="footer-col reveal">
-      <h4>Contact</h4>
+      <h4>Call</h4>
       <a href="tel:+233244464345">024 446 4345</a>
       <a href="tel:+233542015475">054 201 5475</a>
       <a href="tel:+233552500231">055 250 0231</a>
-      <a href="https://instagram.com/vidicbutik" target="_blank" rel="noopener">@vidicbutik</a>
+    </div>
+    <div class="footer-col reveal">
+      <h4>Follow</h4>
+      <a href="https://instagram.com/vidicbutik" target="_blank" rel="noopener">Instagram — @vidicbutik</a>
+      <a href="https://www.facebook.com/vidic.butik.7/" target="_blank" rel="noopener">Facebook — Vidic Butik</a>
+      <a href="https://www.tiktok.com/@vidicboutique" target="_blank" rel="noopener">TikTok — @vidicboutique</a>
     </div>
   </div>
   <div class="wrap footer-bottom">
@@ -321,6 +357,12 @@
     <span>Prototype built by Darlington</span>
   </div>
 </footer>
+
+<div class="lightbox" id="lightbox" hidden>
+  <button class="lightbox-close" id="lightboxClose" aria-label="Close photo">&times;</button>
+  <img id="lightboxImg" src="" alt="">
+  <p class="lightbox-caption" id="lightboxCaption"></p>
+</div>
 
 <script>
   // ============================================================
@@ -441,8 +483,17 @@
         img.src = p.photo;
         img.onerror = function () {
           img.remove();
+          photoDiv.classList.remove('is-zoomable');
           showFallback();
         };
+        photoDiv.classList.add('is-zoomable');
+        photoDiv.setAttribute('role', 'button');
+        photoDiv.setAttribute('tabindex', '0');
+        photoDiv.setAttribute('aria-label', 'View larger photo of ' + p.name);
+        photoDiv.addEventListener('click', function(){ openLightbox(p.photo, p.name); });
+        photoDiv.addEventListener('keydown', function(e){
+          if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); openLightbox(p.photo, p.name); }
+        });
         photoDiv.prepend(img);
       } else {
         showFallback();
@@ -520,6 +571,36 @@
   }
 
   loadCatalog();
+
+  // ---------- Lightbox for product photos ----------
+  const lightbox = document.getElementById('lightbox');
+  const lightboxImg = document.getElementById('lightboxImg');
+  const lightboxCaption = document.getElementById('lightboxCaption');
+  const lightboxClose = document.getElementById('lightboxClose');
+  let lastFocused = null;
+
+  function openLightbox(src, caption) {
+    lastFocused = document.activeElement;
+    lightboxImg.src = src;
+    lightboxImg.alt = caption;
+    lightboxCaption.textContent = caption;
+    lightbox.hidden = false;
+    lightboxClose.focus();
+    document.body.style.overflow = 'hidden';
+  }
+  function closeLightbox() {
+    lightbox.hidden = true;
+    lightboxImg.src = '';
+    document.body.style.overflow = '';
+    if (lastFocused) lastFocused.focus();
+  }
+  lightboxClose.addEventListener('click', closeLightbox);
+  lightbox.addEventListener('click', function(e){
+    if (e.target === lightbox) closeLightbox();
+  });
+  document.addEventListener('keydown', function(e){
+    if (e.key === 'Escape' && !lightbox.hidden) closeLightbox();
+  });
 
   // ---------- Dark mode toggle ----------
   (function(){
